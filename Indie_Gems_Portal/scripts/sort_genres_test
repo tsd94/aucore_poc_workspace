@@ -1,0 +1,48 @@
+# File: test_sort_genres.py
+
+import unittest
+from unittest.mock import mock_open, patch
+from sort_genres import read_and_sort_genres  # Make sure the import path aligns with your project structure
+
+class TestReadAndSortGenres(unittest.TestCase):
+
+    def setUp(self):
+        self.mock_data = '''
+        export default [
+          {
+            "id": 4,
+            "name": "Action",
+            "games_count": 177189
+          },
+          {
+            "id": 3,
+            "name": "Adventure",
+            "games_count": 136213
+          },
+          {
+            "id": 5,
+            "name": "RPG",
+            "games_count": 53575
+          }
+        ]
+        '''
+
+    @patch('builtins.open', new_callable=mock_open, read_data='export default []')
+    def test_read_empty_data(self, mock_file):
+        result = read_and_sort_genres('dummy_path', 2)
+        self.assertEqual(result, [])
+
+    @patch('builtins.open', new_callable=mock_open, read_data='export default ' + mock_data)
+    def test_read_and_sort(self, mock_file):
+        result = read_and_sort_genres('dummy_path', 2)
+        self.assertEqual(len(result), 2)
+        self.assertEqual(result[0]['name'], "Action")
+        self.assertEqual(result[1]['name'], "Adventure")
+
+    @patch('builtins.open', new_callable=mock_open, read_data='export default ' + mock_data)
+    def test_sort_with_n_larger_than_data(self, mock_file):
+        result = read_and_sort_genres('dummy_path', 10)
+        self.assertEqual(len(result), 3)
+
+if __name__ == '__main__':
+    unittest.main()
